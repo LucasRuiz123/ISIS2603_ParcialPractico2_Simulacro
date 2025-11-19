@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Recipe } from '../Recipe';
-import { recipeData } from '../recipeData';
+import { RecipeService } from '../recipe.service';
 
 @Component({
   selector: 'app-recipe-list',
@@ -10,17 +10,27 @@ import { recipeData } from '../recipeData';
 })
 export class RecipeListComponent implements OnInit {
   recipes: Recipe[] = [];
-  selected: Boolean = false;
-  selectedRecipe: Recipe | null = null;
 
-  constructor() {}
+  constructor(private recipeService: RecipeService) {}
 
-  ngOnInit() {
-    this.recipes = recipeData;
+  getRecipes(): void {
+    this.recipeService.getRecipes().subscribe({
+      next: (recipes) => {
+        this.recipes = recipes;
+        console.log('Recetas cargadas:', this.recipes);
+      },
+      error: (error) => {
+        console.error('Error cargando recetas:', error);
+      }
+    });
   }
 
-  onSelect(recipe: Recipe) {
-    this.selectedRecipe = recipe;
-    this.selected = true;
+  ngOnInit() {
+    this.getRecipes();
+  }
+
+  // ✅ Punto 4: Método para contar ingredientes
+  countIngredients(recipe: Recipe): number {
+    return recipe.ingredientes ? recipe.ingredientes.length : 0;
   }
 }
